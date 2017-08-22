@@ -1,0 +1,27 @@
+{
+  "name": "swde",
+  "version": "0.4.0",
+  "description": "Static Web Development Eviroment",
+  "main": "swde.js",
+  "dependencies": {
+    "fs-extra": "^4.0.1",
+    "html-minifier": "^3.5.3",
+    "js-beautify": "^1.6.14",
+    "less": "^2.7.2",
+    "less-plugin-autoprefix": "^1.5.1",
+    "mustache": "^2.3.0",
+    "ncp": "^2.0.0",
+    "rollup": "^0.48.2",
+    "rollup-plugin-buble": "^0.15.0",
+    "rollup-plugin-includepaths": "^0.2.2",
+    "rollup-plugin-uglify": "^2.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "web", "development", "scaffold"
+  ],
+  "author": "Carlos Ascari Gutierrez Hermosillo <ascari.gtz@gmail.com>",
+  "license": "MIT"
+}
