@@ -34,6 +34,7 @@ const DEFAULT_LAYOUT_HTML = `
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset='utf-8'>
   <title>{{ pageName}}</title>
   <link rel="stylesheet" type="text/css" href="css/bundle.css">
 </head>
@@ -116,11 +117,15 @@ const DEFAULT_LESS = {
   path: 'less',
   index: 'index.less',
   filename: 'bundle.css',
-  plugins: [
-    new LessPluginAutoPrefix({
-      browsers: ['last 4 versions']
-    })
-  ],
+  options: {
+    paths: [],
+    plugins: [
+      new LessPluginAutoPrefix({
+        browsers: ['last 4 versions']
+      })
+    ],
+    // sourceMap: {sourceMapFileInline: true}
+  }
 };
 
 const DEFAULT_SVG = {
@@ -196,7 +201,7 @@ const parseOptions = (options) => {
     if (!less.index) less.index = DEFAULT_LESS.index;
     if (less.compress === undefined) less.compress = env === 'production';
     if (!less.filename) less.filename = DEFAULT_LESS.filename;
-    if (!less.plugins) less.plugins = DEFAULT_LESS.plugins;
+    if (!less.options) less.options = DEFAULT_LESS.options;
     if (!less.paths) less.paths = [ pjoin(src, less.path) ];
   }
 
@@ -288,8 +293,16 @@ function StaticWebDevEnv(options) {
             try {
               pagesKeys.forEach(pageName => {
                 const page = html.pages[pageName];
-                const pageSrcPath = pjoin(htmlPath, page.path);
+                const pageSrcPath = path.resolve(htmlPath, page.path);
                 const pageDistPath = pjoin(dist, `${pageName}.html`);
+
+                if (inDevelopment) {
+                  const layoutPath = pjoin(htmlPath, page.layout);
+                  if (page.layout && !existsFile(layoutPath)) {
+                    write(layoutPath, DEFAULT_LAYOUT_HTML);
+                  }
+                }
+
                 const layoutHtml = page.layout ? read(pjoin(htmlPath, page.layout)) : DEFAULT_LAYOUT_HTML;
                 const _vars = Object.assign(
                   {}, 
@@ -309,8 +322,14 @@ function StaticWebDevEnv(options) {
                 const _elements = Object.assign(
                   {},
                   page.elements,
-                  { content: read(pageSrcPath) }
+                  { content: page.path }
                 );
+
+                Object.keys(_elements).map(key => {
+                  const elmPath = pjoin(htmlPath, _elements[key]);
+                  _elements[key] = read(elmPath);
+                });
+
                 const compiledHtml = render(layoutHtml, _vars, _elements);
                 const minifiedHtml = htmlMinify(
                   inProduction ? compiledHtml : htmlBeautify(compiledHtml, html.beautifyOptions),
@@ -363,11 +382,11 @@ function StaticWebDevEnv(options) {
         _paths.unshift(jsPath);
         const _banner = [ localesInit ];
         js.libs
-          .map(path => {
-            const libPath = pjoin(jsPath, path);
-            return read(libPath);
-          })
-          .forEach(libJs => _banner.push(libJs));
+        .map(path => {
+          const libPath = pjoin(jsPath, path);
+          return read(libPath);
+        })
+        .forEach(libJs => _banner.push(libJs));
 
         promises.push(new Promise((ok, no) => {
           rollup({
@@ -411,8 +430,14 @@ function StaticWebDevEnv(options) {
     if (exists(lessPath) && isDir(lessPath)) {
       if (exists(lessIndexPath) && isFile(lessIndexPath)) {
         const lessIndexContent = read(lessIndexPath);
+        const _options = Object.assign(
+          {},
+          less.options,
+          { paths: [ lessPath ] }
+        );
+        less.options.paths.forEach(path => _options.paths.push(path));
         promises.push(new Promise((ok, no) => {
-          lessc.render(lessIndexContent, less.options, (error, output) => {
+          lessc.render(lessIndexContent, _options, (error, output) => {
             if (error) return no(error);
             const distCssPath = pjoin(dist, 'css');
             ensureDir(distCssPath);
