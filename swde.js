@@ -20,7 +20,7 @@ const ls = (path) => fs.readdirSync(path);
 const mkdir = (filepath) => fs.mkdirSync(filepath);
 const pjoin = function() { return path.join.apply(path, arguments) };
 const read =  filepath => fs.readFileSync(filepath, 'utf8');
-const render = (template, options, partials) => mustache.render(template, options, partials);
+const render = (template, options, partials) => mustache.render(template, options, partials); // tags = ['{{', '}}'] 
 const write = (filepath, content) => fs.outputFileSync(filepath, content);
 const existsDir = (path) => exists(path) && isDir(path);
 const existsFile = (path) => exists(path) && isFile(path);
@@ -87,6 +87,9 @@ const DEFAULT_FONT = {
 
 const DEFAULT_HTML = {
   path: 'html',
+  mustache: {
+    tags: [ '{{', '}}' ]
+  },
   beautifyOptions: {
     indent_size: 2,
     preserve_newlines: false
@@ -154,14 +157,14 @@ const parseOptions = (options) => {
     svg=DEFAULT_SVG,
     video=DEFAULT_VIDEO,
   } = options;
-  const fontEnabled = font !== false;
+  const fontEnabled = font;
   const htmlEnabled = html !== false;
-  const i18nEnabled = i18n !== false;
-  const imgEnabled = img !== false;
-  const jsEnabled = js !== false;
-  const lessEnabled = less !== false;
-  const svgEnabled = svg !== false;
-  const videoEnabled = video !== false;
+  const i18nEnabled = i18n;
+  const imgEnabled = img;
+  const jsEnabled = js;
+  const lessEnabled = less;
+  const svgEnabled = svg;
+  const videoEnabled = video;
 
   src = path.resolve(src);
   dist = path.resolve(dist);
@@ -175,6 +178,7 @@ const parseOptions = (options) => {
     if (!html.minifyOptions) html.minifyOptions = DEFAULT_HTML.minifyOptions;
     if (!html.beautifyOptions) html.beautifyOptions = DEFAULT_HTML.beautifyOptions;
     if (!html.pages) html.pages = DEFAULT_HTML.pages;
+    if (!html.mustache) html.mustache = DEFAULT_HTML.mustache;
   }
 
   if (i18nEnabled) {
@@ -283,6 +287,7 @@ function StaticWebDevEnv(options) {
   }
   
   if (html.path) {
+    if (html.mustache && html.mustache.tags) mustache.tags = html.mustache.tags;
     const htmlPath = pjoin(src, html.path);
     if (inDevelopment) ensureDir(htmlPath);
     if (exists(htmlPath) && isDir(htmlPath)) {
