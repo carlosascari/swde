@@ -1,11 +1,15 @@
 {
   "name": "swde",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "Static Web Development Eviroment",
   "main": "swde.js",
   "dependencies": {
+    "async": "^2.5.0",
     "fs-extra": "^4.0.1",
     "html-minifier": "^3.5.3",
+    "imagemin": "^5.3.1",
+    "imagemin-jpegtran": "^5.0.2",
+    "imagemin-pngcrush": "^5.1.0",
     "js-beautify": "^1.6.14",
     "less": "^2.7.2",
     "less-plugin-autoprefix": "^1.5.1",
@@ -20,7 +24,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "web", "development", "scaffold"
+    "web",
+    "development",
+    "scaffold",
+    "static"
   ],
   "author": "Carlos Ascari Gutierrez Hermosillo <ascari.gtz@gmail.com>",
   "license": "MIT"
