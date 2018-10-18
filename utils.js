@@ -1,6 +1,6 @@
 /*!
 * swde
-* Copyright(c) 2017 Carlos Ascari Gutierrez Hermosillo
+* Copyright(c) 2017-2018 Carlos Ascari Gutierrez Hermosillo
 * MIT License
 */
 
@@ -16,6 +16,7 @@ const isFile = (path) => fs.statSync(path).isFile();
 const ls = (path, recursive) => recursive ? lsRecursive(path) : fs.readdirSync(path);
 const mkdir = (filepath) => fs.mkdirSync(filepath);
 const pjoin = function() { return path.join.apply(path, arguments) };
+const presolve = function() { return path.resolve.apply(path, arguments) };
 const read =  filepath => fs.readFileSync(filepath, 'utf8');
 const render = (template, options, partials) => mustache.render(template, options, partials);
 const write = (filepath, content) => fs.outputFileSync(filepath, content);
@@ -35,7 +36,6 @@ const lsRecursive = (targetPath) => {
   return list;
 }
 
-
 module.exports = Object.assign(
   util,
   {
@@ -50,6 +50,7 @@ module.exports = Object.assign(
     lsRecursive,
     mkdir,
     pjoin,
+    presolve,
     read,
     render,
     write,

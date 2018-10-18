@@ -1,10 +1,11 @@
 {
   "name": "swde",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Static Web Development Eviroment",
-  "main": "swde.js",
+  "main": "index.js",
   "dependencies": {
     "async": "^2.5.0",
+    "fontmin": "^0.9.7-beta",
     "fs-extra": "^4.0.1",
     "html-minifier": "^3.5.3",
     "imagemin": "^5.3.1",
@@ -18,7 +19,8 @@
     "rollup": "^0.48.2",
     "rollup-plugin-buble": "^0.15.0",
     "rollup-plugin-includepaths": "^0.2.2",
-    "rollup-plugin-uglify": "^2.0.1"
+    "rollup-plugin-uglify": "^2.0.1",
+    "svgo": "^1.0.5"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
