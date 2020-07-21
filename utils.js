@@ -1,6 +1,6 @@
 /*!
 * swde
-* Copyright(c) 2017-2018 Carlos Ascari Gutierrez Hermosillo
+* Copyright(c) 2017-2020 Carlos Ascari Gutierrez Hermosillo
 * MIT License
 */
 
@@ -35,6 +35,11 @@ const lsRecursive = (targetPath) => {
   });
   return list;
 }
+const flatten = (array) => {
+  return array.reduce(function (flat, toFlatten) {
+    return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+  }, []);
+}
 
 module.exports = Object.assign(
   util,
@@ -44,6 +49,7 @@ module.exports = Object.assign(
     exists,
     existsDir,
     existsFile,
+    flatten,
     isDir,
     isFile,
     ls,

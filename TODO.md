@@ -1,0 +1,3 @@
+
+-
+- Fix pngcrush EACESS issue

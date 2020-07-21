@@ -1,6 +1,6 @@
 /*!
 * swde
-* Copyright(c) 2017-2018 Carlos Ascari Gutierrez Hermosillo
+* Copyright(c) 2017-2020 Carlos Ascari Gutierrez Hermosillo
 * MIT License
 */
 
@@ -8,13 +8,13 @@ const async = require('async');
 const utils = require('./utils');
 
 const { assign, keys } = Object;
-const { ensureDir, exists, isDir, presolve } = utils;
+const { ensureDir, exists, isDir, presolve, flatten } = utils;
 
 /**
 * Order in which modules are executed. This allows
 * js & css to be inlined in a html page, since the
 * html module is processed last and has access to
-* the failes via the `variables` global variable.
+* the files via the `variables` global variable.
 */
 const ORDERED_MODULES = [
   'i18n',
@@ -32,8 +32,11 @@ const ORDERED_MODULES = [
 * @return {Promise}
 */
 function Swde(options) {
-  if (Array.isArray(options)) {
-    return Promise.all(options.map(opts => Swde(opts)));
+  if (arguments.length > 1 || Array.isArray(options)) {
+    return Promise.all(
+      flatten(Array.prototype.slice.call(arguments))
+      .map(opts => Swde(opts))
+    );
   }
 
   // Global scoped variables (shared by modules)
@@ -68,8 +71,14 @@ function Swde(options) {
   // Load prcoessing modules
   const modules = {};
   Object.keys(options)
-  .filter(k => options[k] && typeof options[k] === 'object')
-  .map(ns => modules[ns] = new (require(`./modules/${ ns }`))(options[ns]));
+  .filter(key => options[key] && typeof options[key] === 'object')
+  .forEach(key => {
+    try {
+      modules[key] = new (require(`./modules/${ key }`))(options[key]);
+    } catch(e) {
+      console.log(e);
+    }
+  });
 
   // Build
   return new Promise((ok, no) => {
@@ -78,23 +87,21 @@ function Swde(options) {
       .filter(ns => options[ns])
       .map(ns => function(next) {
         // Run module
-        modules[ns].start(src, dist, env, variables)
+        modules[ns]
+        .start(src, dist, env, variables)
         .then(() => next())
         .catch((e) => {
-          console.log(e)
-          next(e)
+          console.log(e);
+          next(e);
         });
       }),
-      (errors) => {
+      errors => {
         if (errors) {
-          errors = errors.filter(x => x);
-          if (errors.length) {
-            console.log(errors)
-            return no(errors);
-          }
-          ok()
+          console.log(errors);
+          return no(errors);
+          ok();
         } else {
-          ok()
+          ok();
         }
       }
     );
