@@ -1,6 +1,6 @@
 {
   "name": "swde",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "Static Web Development Enviroment",
   "main": "index.js",
   "dependencies": {
