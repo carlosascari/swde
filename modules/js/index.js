@@ -7,7 +7,7 @@
 const rollup = require('rollup').rollup;
 const rollupPluginBuble = require('rollup-plugin-buble');
 const rollupPluginIncludePaths = require('rollup-plugin-includepaths');
-const rollupPluginUglify = require('rollup-plugin-uglify');
+const rollupPluginUglify = require('rollup-plugin-uglify').uglify;
 const Module = require('../../module.js');
 const utils = require('../../utils');
 const defaults = require('./defaults');
@@ -136,7 +136,8 @@ class Js extends Module {
       rollup({
         input: srcJsIndexPath,
         // sourceMap: env === 'development',
-        plugins: activeRollupPlugins
+        plugins: activeRollupPlugins,
+        context: 'this'
       })
       .then(bundle => {
         if (!options.noFile) {
@@ -148,7 +149,9 @@ class Js extends Module {
         }
 
         if (options.exposeHtml || options.noFile) {
-          bundle.generate({ format: 'es' })
+          bundle.generate({
+            format: 'es',
+          })
           .then(({ code, map }) => {
             if (!vars.html) vars.html = {};
             vars.html.js = {
